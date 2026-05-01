@@ -30,6 +30,17 @@ def start(SDA_pin,SCL_pin): #la transicion de SDA de HIGH a LOW con SCL en HIGH 
 
 	_SCL_low(SCL_pin)
 
+def stop(SDA_pin, SCL_pin): #la transición de SDA de LOW a HIGH con SCL en HIGH es la condición de STOP
+
+    _SCL_low(SCL_pin)
+    _SDA_low(SDA_pin)
+    time.sleep(sleep_time)
+
+    _SCL_high(SCL_pin)
+    time.sleep(sleep_time)
+
+    _SDA_high(SDA_pin)  		#STOP
+    time.sleep(sleep_time)
 
 def send_msg(msg_to_send, msg_size, SDA_pin, SCL_pin):
 
@@ -71,3 +82,47 @@ def send_msg(msg_to_send, msg_size, SDA_pin, SCL_pin):
 
 	return ack
 
+def read_byte(SDA_pin, SCL_pin):
+
+    byte = 0
+
+    _SDA_high(SDA_pin)  #soltamos SDA
+
+    for i in range(8):
+
+        _SCL_low(SCL_pin)
+        time.sleep(sleep_time)
+
+        _SCL_high(SCL_pin)
+        time.sleep(sleep_time)
+
+        bit = GPIO.input(SDA_pin) #lee el bit del pin SDA
+
+        byte = (byte << 1) | bit #arma el byte
+
+    _SCL_low(SCL_pin)
+
+    return byte
+
+def send_ack_bit(SDA_pin, SCL_pin, ack=True):
+    
+    #ack=True -> manda ACK (0)
+    #ack=False -> manda NACK (1)
+
+    _SCL_low(SCL_pin)
+    time.sleep(sleep_time)
+
+    if ack:
+        _SDA_low(SDA_pin)   #ACK
+    else:
+        _SDA_high(SDA_pin)  #NACK
+
+    time.sleep(sleep_time)
+
+    _SCL_high(SCL_pin)
+    time.sleep(sleep_time)
+
+    _SCL_low(SCL_pin)
+    time.sleep(sleep_time)
+
+    _SDA_high(SDA_pin)  #soltamos SDA
