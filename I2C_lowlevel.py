@@ -3,6 +3,10 @@ import time
 
 sleep_time = 0.00001
 
+def I2C_init():
+	GPIO.setmode(GPIO.BCM) #define como se nombran los pines
+	GPIO.setwarnings(False) #para que no grite por setear los pines muchas veces
+
 def _SDA_high(pin):
     GPIO.setup(pin, GPIO.IN)
 
@@ -19,7 +23,7 @@ def _SCL_low(pin):
     GPIO.setup(pin, GPIO.OUT)
     GPIO.output(pin, 0)
 
-def start(SDA_pin,SCL_pin): #la transicion de SDA de HIGH a LOW con SCL en HIGH es la condición de START
+def _start(SDA_pin,SCL_pin): #la transicion de SDA de HIGH a LOW con SCL en HIGH es la condición de START
 
 	_SDA_high(SDA_pin)
 	_SCL_high(SCL_pin)
@@ -30,7 +34,7 @@ def start(SDA_pin,SCL_pin): #la transicion de SDA de HIGH a LOW con SCL en HIGH 
 
 	_SCL_low(SCL_pin)
 
-def stop(SDA_pin, SCL_pin): #la transición de SDA de LOW a HIGH con SCL en HIGH es la condición de STOP
+def _stop(SDA_pin, SCL_pin): #la transición de SDA de LOW a HIGH con SCL en HIGH es la condición de STOP
 
     _SCL_low(SCL_pin)
     _SDA_low(SDA_pin)
@@ -42,14 +46,14 @@ def stop(SDA_pin, SCL_pin): #la transición de SDA de LOW a HIGH con SCL en HIGH
     _SDA_high(SDA_pin)  		#STOP
     time.sleep(sleep_time)
 
-def send_msg(msg_to_send, msg_size, SDA_pin, SCL_pin):
+def _send_byte(msg_to_send, SDA_pin, SCL_pin):
 
 	_SCL_low(SCL_pin)
 	time.sleep(sleep_time)
 
-	for i in range(msg_size):
+	for i in range(8):
 
-		bit_to_send = msg_to_send >> (msg_size - 1 - i) & 1
+		bit_to_send = msg_to_send >> (8 - 1 - i) & 1
 
 		if(bit_to_send):
 			
@@ -82,7 +86,7 @@ def send_msg(msg_to_send, msg_size, SDA_pin, SCL_pin):
 
 	return ack
 
-def read_byte(SDA_pin, SCL_pin):
+def _read_byte(SDA_pin, SCL_pin):
 
     byte = 0
 
@@ -104,7 +108,7 @@ def read_byte(SDA_pin, SCL_pin):
 
     return byte
 
-def send_ack_bit(SDA_pin, SCL_pin, ack=True):
+def _send_ack_bit(SDA_pin, SCL_pin, ack=True):
     
     #ack=True -> manda ACK (0)
     #ack=False -> manda NACK (1)
@@ -126,3 +130,12 @@ def send_ack_bit(SDA_pin, SCL_pin, ack=True):
     time.sleep(sleep_time)
 
     _SDA_high(SDA_pin)  #soltamos SDA
+
+'''
+#Current Address read
+start(DATA,CLK)
+print(send_msg(msg_read,8,DATA,CLK))
+print(read_byte(DATA,CLK))
+send_ack_bit(DATA,CLK,1)
+stop(DATA,CLK)
+'''
