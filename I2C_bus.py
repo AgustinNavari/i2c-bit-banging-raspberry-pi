@@ -16,7 +16,7 @@ class SoftI2C:
         return _send_byte(byte, self.SDA, self.SCL) == 0 #ACK (0) devuelve True, NACK (1) devuelve False
 
     def read_byte(self, ack=True):
-        byte = read_byte(self.SDA, self.SCL)
+        byte = _read_byte(self.SDA, self.SCL)
         _send_ack_bit(self.SDA, self.SCL, ack)
         return byte
 

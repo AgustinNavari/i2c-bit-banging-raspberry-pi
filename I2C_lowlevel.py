@@ -44,7 +44,7 @@ def _stop(SDA_pin, SCL_pin): #la transición de SDA de LOW a HIGH con SCL en HIG
     time.sleep(sleep_time)
 
     _SDA_high(SDA_pin)  		#STOP
-    time.sleep(sleep_time)
+    time.sleep(sleep_time * 5)
 
 def _send_byte(msg_to_send, SDA_pin, SCL_pin):
 
